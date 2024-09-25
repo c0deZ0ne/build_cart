@@ -1,0 +1,116 @@
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikThin.otf") format("opentype");
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikThinItalic.otf") format("opentype");
+    font-weight: 100;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikExtralight.otf") format("opentype");
+    font-weight: 200;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikExtralightItalic.otf") format("opentype");
+    font-weight: 200;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikLight.otf") format("opentype");
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikLightItalic.otf") format("opentype");
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikRegular.otf") format("opentype");
+    font-weight: 400; /* Change to 400 */
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikRegularItalic.otf") format("opentype");
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikMedium.otf") format("opentype");
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikMediumItalic.otf") format("opentype");
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikSemibold.otf") format("opentype");
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikSemiboldItalic.otf") format("opentype");
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikBold.otf") format("opentype");
+    font-weight: 700; /* Change to 700 */
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikBoldItalic.otf") format("opentype");
+    font-weight: 700; /* Change to 700 */
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikSuper.otf") format("opentype");
+    font-weight: 800;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikSuperItalic.otf") format("opentype");
+    font-weight: 800;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikBlack.otf") format("opentype");
+    font-weight: 900;
+}
+
+@font-face {
+    font-family: "Graphik";
+    src: url("./Graphik/GraphikBlackItalic.otf") format("opentype");
+    font-weight: 900;
+    font-style: italic;
+}

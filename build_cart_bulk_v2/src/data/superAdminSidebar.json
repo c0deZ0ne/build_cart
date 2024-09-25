@@ -1,0 +1,86 @@
+{
+  "main": [
+    {
+      "title": "Dashboard",
+      "url": "/super-admin/dashboard",
+      "icon": "DashboardIcon"
+    },
+    {
+      "title": "Customers",
+      "icon": "FundManagerIcon",
+      "submenu": [
+        {
+          "title": "Fund managers",
+          "url": "/super-admin/fund-managers"
+        },
+        {
+          "title": "Builders",
+          "url": "/super-admin/builders"
+        },
+        {
+          "title": "Vendors",
+          "url": "/super-admin/vendors"
+        }
+      ]
+    },
+    {
+      "title": "Transactions",
+      "icon": "Vault",
+      "url": "/super-admin/transactions",
+      "submenu": [
+        {
+          "url": "/super-admin/transactions/orders",
+          "title": "Orders"
+        },
+        {
+          "url": "/super-admin/transactions/revenue",
+          "title": "Revenue"
+        }
+      ]
+    },
+    {
+      "title": "Product Category",
+      "url": "/super-admin/product-category",
+      "icon": "ProjectInvitationIcon"
+    },
+    {
+      "title": "Payouts",
+      "url": "/super-admin/payouts",
+      "icon": "Vault"
+    }
+  ],
+  "customer support": [
+    {
+      "title": "ID Verfication",
+      "url": "/super-admin/verification",
+      "icon": "TeamIcon"
+    },
+    {
+      "title": "Dispute Resolution",
+      "url": "/super-admin/dispute",
+      "icon": "CopySuccess"
+    },
+    {
+      "title": "Account Recovery Request",
+      "url": "/super-admin/account-recovery",
+      "icon": "Lock"
+    }
+  ],
+  "account": [
+    {
+      "title": "Team",
+      "url": "/super-admin/team",
+      "icon": "TeamIcon"
+    },
+    {
+      "title": "Logs",
+      "url": "/super-admin/logs",
+      "icon": "SupportIcon"
+    },
+    {
+      "title": "Profile Settings",
+      "url": "/super-admin/settings",
+      "icon": "SettingsIcon"
+    }
+  ]
+}

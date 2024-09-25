@@ -1,0 +1,56 @@
+{
+  "main": [
+    {
+      "title": "Dashboard",
+      "url": "/builder/dashboard",
+      "icon": "DashboardIcon"
+    },
+    {
+      "title": "Projects",
+      "icon": "ProjectsIcon",
+      "submenu": [
+        {
+          "title": "Company Projects",
+          "url": "/builder/company-project"
+        },
+        {
+          "title": "Fund Manager Projects",
+          "url": "/builder/fund-manager-project"
+        }
+      ],
+      "dynamics": ["/builder/company-project/details/"]
+    },
+    {
+      "title": "Fund Manager",
+      "url": "/builder/fund-manager",
+      "icon": "FundManagerIcon"
+    },
+    {
+      "title": "Supplier",
+      "url": "/builder/vendors",
+      "icon": "PeopleIcon"
+    },
+    {
+      "title": "Project Invitation",
+      "url": "/builder/project-invitations",
+      "icon": "ProjectInvitationIcon"
+    }
+  ],
+  "account": [
+    {
+      "title": "Team",
+      "url": "/team",
+      "icon": "TeamIcon"
+    },
+    {
+      "title": "Vault",
+      "url": "/builder/vault",
+      "icon": "Vault"
+    },
+    {
+      "title": "Support",
+      "url": "/support",
+      "icon": "SupportIcon"
+    }
+  ]
+}

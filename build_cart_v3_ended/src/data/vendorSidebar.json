@@ -1,0 +1,41 @@
+{
+  "main": [
+    {
+      "title": "Dashboard",
+      "url": "/vendor/dashboard",
+      "icon": "DashboardIcon"
+    },
+    {
+      "title": "Bid Board",
+      "icon": "ProjectsIcon",
+      "url": "/vendor/bid-board"
+    },
+    {
+      "title": "Order Management",
+      "url": "/vendor/order-management",
+      "icon": "FundManagerIcon"
+    },
+    {
+      "title": "Product Category",
+      "url": "/vendor/categories",
+      "icon": "SuppliersIcon"
+    },
+    {
+      "title": "Earnings and Withdrawals",
+      "url": "/vendor/earnings-withdrawals",
+      "icon": "ProjectInvitationIcon"
+    }
+  ],
+  "account": [
+    {
+      "title": "Support",
+      "url": "/support",
+      "icon": "SupportIcon"
+    },
+    {
+      "title": "Settings",
+      "url": "/vendor/settings",
+      "icon": "TeamIcon"
+    }
+  ]
+}

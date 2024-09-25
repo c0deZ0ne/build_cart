@@ -1,0 +1,54 @@
+services:
+  api:
+    image: cutstruct-backend-v2-api-i
+    container_name: cutstruct-backend-v2-api-c
+    build:
+      dockerfile: Dockerfile
+      context: .
+      # Only will build development stage from our dockerfile
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    env_file:
+    - .env
+    # Run a command against the development stage of the image
+    command: npm run start:dev
+    ports:
+      - 3000:3000
+    depends_on:
+      - redis
+      - postgres
+  redis:
+    image: redis:6-alpine
+    container_name: cutstruct-backend-v2-redis-c
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+  postgres:
+    image: postgres:15.1
+    container_name: cutstruct-backend-v2-postgres-c
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '6500:5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data     
+  adminer_container:
+     image: adminer:latest
+     container_name: cutstruct-backend-v2-adminer-db-view
+     environment: 
+        ADMINER_DEFAULT_SERVER: postgres
+        ADMINER_DESIGN: galkaev
+     ports: 
+          - 8080:8080
+volumes:
+  redis:
+    driver: local
+  postgres:
+      name: cutstruct-backend-v2-postgres-db

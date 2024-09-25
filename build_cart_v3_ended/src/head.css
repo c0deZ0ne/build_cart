@@ -1,0 +1,91 @@
+.auth-card {
+  margin: 30px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  color: #211f5c;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.auth-card .h1 {
+  font-weight: 700;
+}
+
+.auth-card .h1 .p {
+  text-align: center;
+}
+
+.auth-card .p {
+  font-weight: 300;
+  font-size: 14px;
+}
+
+*:focus,
+*:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.round-checkbox .chakra-checkbox__control {
+  border-radius: 50%;
+}
+
+.custom-radio-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  width: 200px;
+  padding: 15px 20px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  font-size: 18px;
+}
+
+.react-tel-input .form-control {
+  width: 100% !important;
+  border: 1px solid #999999 !important;
+  border-radius: 4px 0 0 4px !important;
+  border-right: 0px !important;
+  height: 45px !important;
+  font-weight: 400;
+  font-size: 0.9em;
+  padding: 10px 48px;
+}
+
+.react-tel-input .form-control:focus {
+  border: 1px solid #f5862e !important;
+  outline: 0;
+}
+
+.flag-dropdown {
+  height: 45px !important;
+}
+
+.datepicker_width {
+  width: 100%;
+}
+
+.chakra-tabs__tablist {
+  width: max-content;
+}
+
+#js-app-loader {
+  z-index: 9999 !important;
+}
+
+.remita-pay-button {
+  background: #12355a;
+  color: #ffffff;
+  padding: 13px;
+  font-weight: 500;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.remita-pay-button:hover {
+  background: #12355ae3;
+}

@@ -1,0 +1,132 @@
+# Template docker-push
+
+# This template allows you to build and push your docker image to a Docker Hub account.
+# The workflow allows running tests, code linting and security scans on feature branches (as well as master).
+# The docker image will be validated and pushed to the docker registry after the code is merged to master.
+
+# Prerequisites: $DOCKERHUB_USERNAME, $DOCKERHUB_PASSWORD setup as deployment variables
+
+image: atlassian/default-image:3
+
+pipelines:
+  default:
+    - parallel:
+        - step:
+            name: Build and Test
+            script:
+              - IMAGE_NAME=$BITBUCKET_REPO_SLUG
+              - docker build . --file Dockerfile --tag ${IMAGE_NAME}
+            services:
+              - docker
+            caches:
+              - docker
+        - step:
+            name: Lint the Dockerfile
+            image: hadolint/hadolint:latest-debian
+            script:
+              - hadolint Dockerfile
+  branches:
+    staging:
+      - step:
+          name: Build and Test
+          script:
+            - IMAGE_NAME="staging-server-backend"
+            - docker build --build-arg NODE_ENV=staging --target staging . --file Dockerfile.staging --tag ${IMAGE_NAME}
+            - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - "*.tar"
+      - step:
+          name: Push to Docker Registry
+          script:
+            - echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            - IMAGE_NAME="staging-server-backend"
+            - docker load --input "${IMAGE_NAME}.tar"
+            - VERSION="test-0.1.${BITBUCKET_BUILD_NUMBER}"
+            - IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+          services:
+            - docker
+      - step:
+          name: Deploy to Staging Server
+          deployment: Staging
+          script:
+          - export IMAGE_NAME="staging-server-backend"
+          - export VERSION="test-0.1.${BITBUCKET_BUILD_NUMBER}"
+          - export IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+          - export CONTAINER_NAME="staging-server-backend-${BITBUCKET_BUILD_NUMBER}"
+          - pipe: atlassian/ssh-run:0.2.2
+            variables:
+              SSH_USER: $SSH_USER
+              SERVER: $SSH_SERVER
+              COMMAND: |
+                if [ -n "$CONTAINERS_TO_STOP" ]; then
+                  docker stop $CONTAINERS_TO_STOP
+                fi
+                echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                # if docker ps -aqf name=$CONTAINER_NAME; then
+                #   docker start $CONTAINER_NAME
+                # else
+                docker run -e "SEAMAILER_PUBLIC_KEY=$SEAMAILER_PUBLIC_KEY" -e "CALLBACK_URL=$CALLBACK_URL" -e "REMITA_BASE_URL=$REMITA_BASE_URL" -e "REMITA_PUBLIC_KEY=$REMITA_PUBLIC_KEY" -e "REMITA_PRIVATE_KEY=$REMITA_PRIVATE_KEY" -e "AUTH_URL=$AUTH_URL" -e "ADMIN_MAIL=$ADMIN_MAIL" -e "RFQ_MAIL_RECEIVER=$RFQ_MAIL_RECEIVER" -e "PAYMENT_VERIFY_SERVER=$PAYMENT_VERIFY_SERVER" -e "tribe_account_ref=$tribe_account_ref" -e "TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID" -e "TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN" -e "TWILIO_PHONE_NUMBER=$TWILIO_PHONE_NUMBER" -e "public_key=$public_key" -e "MAIL_LOGO_LIGHT=$MAIL_LOGO_LIGHT" -e "MAIL_LOGO_DARK=$MAIL_LOGO_DARK" -e "merchant_private_key=$merchant_private_key" -e "private_key=$private_key" -e "access_token=$access_token" -e "bani_base_url=$bani_base_url" -e "JWT_EXPIRATION=$JWT_EXPIRATION" -e "MAIL_HOST=$MAIL_HOST" -e "V1_POSTGRES_PORT=$V1_POSTGRES_PORT" -e "V1_POSTGRES_USER=$V1_POSTGRES_USER" -e "V1_POSTGRES_DB=$V1_POSTGRES_DB" -e "JWT_SECRET=$JWT_SECRET" -e "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" -e "PAYSTACK_SECRET=$PAYSTACK_SECRET" -e "MAIL_USER=$MAIL_USER" -e "POSTGRES_HOST=$POSTGRES_HOST" -e "POSTGRES_USER=$POSTGRES_USER" -e "POSTGRES_DB=$POSTGRES_DB" -e "MAIL_PASSWORD=$MAIL_PASSWORD" -e "MAIL_FROM=$MAIL_FROM" -e "APP_NAME=$APP_NAME" -e "V1_POSTGRES_HOST=$V1_POSTGRES_HOST" -e "V1_POSTGRES_PASSWORD=$V1_POSTGRES_PASSWORD" -e "POSTGRES_PORT=$POSTGRES_PORT" -e "APP_URL=$APP_URL" --name $CONTAINER_NAME -p $SERVER_PORT:$SERVER_PORT -d "${IMAGE}:${VERSION}"
+                # fi
+                docker exec -it $CONTAINER_NAME sh -c 'echo "yes" | npx sequelize-cli db:migrate'
+                docker system prune -a -f
+          services:
+          - docker
+
+
+    main:
+      - step:
+          name: Build and Test Backend Live
+          script:
+            - IMAGE_NAME="cutstruct_backend_v2_pro_live"
+            - docker build --build-arg NODE_ENV=production --target production . --file Dockerfile.production --tag ${IMAGE_NAME}
+            - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - "*.tar"
+      - step:
+          name: Push Backend Live to Docker Registry
+          script:
+            - echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            - IMAGE_NAME="cutstruct_backend_v2_pro_live"
+            - docker load --input "${IMAGE_NAME}.tar"
+            - VERSION="live-0.2.${BITBUCKET_BUILD_NUMBER}"
+            - IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+          services:
+            - docker
+      - step:
+          name: Deploy Backend Live to Server
+          deployment: Production
+          script:
+          - export IMAGE_NAME="cutstruct_backend_v2_pro_live"
+          - export VERSION="live-0.2.${BITBUCKET_BUILD_NUMBER}"
+          - export IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+          - export CONTAINER_NAME="cutstruct_backend_v2_pro_live-${BITBUCKET_BUILD_NUMBER}"
+          - pipe: atlassian/ssh-run:0.2.2
+            variables:
+              SSH_USER: $SSH_USER
+              SERVER: $SSH_SERVER
+              COMMAND: |
+                if [ -n "$CONTAINERS_TO_STOP" ]; then
+                  docker stop $CONTAINERS_TO_STOP
+                fi
+                echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                # if docker ps -aqf name=$CONTAINER_NAME; then
+                #   docker start $CONTAINER_NAME
+                # else
+                docker run -e "SEAMAILER_PUBLIC_KEY=$SEAMAILER_PUBLIC_KEY" -e "CALLBACK_URL=$CALLBACK_URL" -e "REMITA_BASE_URL=$REMITA_BASE_URL" -e "REMITA_PUBLIC_KEY=$REMITA_PUBLIC_KEY" -e "REMITA_PRIVATE_KEY=$REMITA_PRIVATE_KEY" -e "AUTH_URL=$AUTH_URL" -e "ADMIN_MAIL=$ADMIN_MAIL" -e "RFQ_MAIL_RECEIVER=$RFQ_MAIL_RECEIVER" -e "PAYMENT_VERIFY_SERVER=$PAYMENT_VERIFY_SERVER" -e "tribe_account_ref=$tribe_account_ref" -e "TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID" -e "TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN" -e "TWILIO_PHONE_NUMBER=$TWILIO_PHONE_NUMBER" -e "public_key=$public_key" -e "MAIL_LOGO_LIGHT=$MAIL_LOGO_LIGHT" -e "MAIL_LOGO_DARK=$MAIL_LOGO_DARK" -e "merchant_private_key=$merchant_private_key" -e "private_key=$private_key" -e "access_token=$access_token" -e "bani_base_url=$bani_base_url" -e "JWT_EXPIRATION=$JWT_EXPIRATION" -e "MAIL_HOST=$MAIL_HOST" -e "V1_POSTGRES_PORT=$V1_POSTGRES_PORT" -e "V1_POSTGRES_USER=$V1_POSTGRES_USER" -e "V1_POSTGRES_DB=$V1_POSTGRES_DB" -e "JWT_SECRET=$JWT_SECRET" -e "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" -e "PAYSTACK_SECRET=$PAYSTACK_SECRET" -e "MAIL_USER=$MAIL_USER" -e "POSTGRES_HOST=$POSTGRES_HOST" -e "POSTGRES_USER=$POSTGRES_USER" -e "POSTGRES_DB=$POSTGRES_DB" -e "MAIL_PASSWORD=$MAIL_PASSWORD" -e "MAIL_FROM=$MAIL_FROM" -e "APP_NAME=$APP_NAME" -e "V1_POSTGRES_HOST=$V1_POSTGRES_HOST" -e "V1_POSTGRES_PASSWORD=$V1_POSTGRES_PASSWORD" -e "POSTGRES_PORT=$POSTGRES_PORT" -e "APP_URL=$APP_URL" --name $CONTAINER_NAME -p $SERVER_PORT:$SERVER_PORT -d "${IMAGE}:${VERSION}"
+                # fi
+                docker exec -it $CONTAINER_NAME sh -c 'echo "yes" | npx sequelize-cli db:migrate'
+                docker system prune -a -f
+          services:
+          - docker        

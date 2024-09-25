@@ -1,0 +1,126 @@
+options:
+  docker: true
+  size: 2x
+
+pipelines:
+  default:
+    - step:
+          name: Running Build
+          script:
+            - export NODE_OPTIONS=--max_old_space_size=8192
+            - IMAGE_NAME="cutstruct_bulk_v2"
+            - docker build . --file Dockerfile --tag ${IMAGE_NAME}
+            - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
+          services:
+            - docker
+          caches:
+            - docker   
+  branches:
+    main:
+      - step:
+          name: Production Running Build
+          script:
+            - export NODE_OPTIONS=--max_old_space_size=8192
+            - IMAGE_NAME="cutstruct_bulk_v2_live"
+            - docker build --build-arg NODE_ENV=production --target production . --file Dockerfile.prod --tag ${IMAGE_NAME}
+            - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - '*.tar'
+      - step:
+          name: Production Push to Docker Registry
+          script:
+            - echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            - IMAGE_NAME="cutstruct_bulk_v2_live"
+            - docker load --input "${IMAGE_NAME}.tar"
+            - VERSION="main-0.1.${BITBUCKET_BUILD_NUMBER}"
+            - IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+          services:
+            - docker
+      - step:
+          name: Production Deploy to Digital Ocean
+          deployment: Production
+          script:
+            - export IMAGE_NAME="cutstruct_bulk_v2_live"
+            - export VERSION="main-0.1.${BITBUCKET_BUILD_NUMBER}"
+            - export IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+            - export CONTAINER_NAME="cutstruct_bulk_v2_main-${BITBUCKET_BUILD_NUMBER}"
+            - pipe: atlassian/ssh-run:0.2.2
+              variables:
+                SSH_USER: $SSH_USER
+                SERVER: $SSH_SERVER
+                # SSH_KEY: $SSH_KEY
+                COMMAND: |
+                  # docker stop $CONTAINERS_TO_STOP
+                  # docker rm -f $(docker ps -qa)
+                  # docker rmi -f $(docker images -aq)
+                  # echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                  if [ -n "$CONTAINERS_TO_STOP" ]; then
+                  docker stop $CONTAINERS_TO_STOP
+                  fi
+                  echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                  docker run  --name $CONTAINER_NAME -dp $SERVER_PORT:$SERVER_PORT "${IMAGE}:${VERSION}"
+                  docker system prune -a -f
+          services:
+            - docker
+
+    staging:
+      - step:
+          name: Staging Running Build
+          script:
+            - export NODE_OPTIONS=--max_old_space_size=8192
+            - IMAGE_NAME="cutstruct_bulk_v2_staging"
+            - docker build --build-arg NODE_ENV=staging --target staging . --file Dockerfile.staging --tag ${IMAGE_NAME}
+            - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - '*.tar'
+      - step:
+          name: Staging Push to Docker Registry
+          script:
+            - echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            - IMAGE_NAME="cutstruct_bulk_v2_staging"
+            - docker load --input "${IMAGE_NAME}.tar"
+            - VERSION="staging-0.1.${BITBUCKET_BUILD_NUMBER}"
+            - IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+          services:
+            - docker
+      - step:
+          name: Staging Deploy to Digital Ocean
+          deployment: Staging
+          script:
+            - export IMAGE_NAME="cutstruct_bulk_v2_staging"
+            - export VERSION="staging-0.1.${BITBUCKET_BUILD_NUMBER}"
+            - export IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
+            - export CONTAINER_NAME="cutstruct_bulk_v2_staging-${BITBUCKET_BUILD_NUMBER}"
+            - pipe: atlassian/ssh-run:0.2.2
+              variables:
+                SSH_USER: $SSH_USER
+                SERVER: $SSH_SERVER
+                # SSH_KEY: $SSH_KEY
+                COMMAND: |
+                  # docker rm -f $(docker ps -qa)
+                  # docker rmi -f $(docker images -aq)
+                  # echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                  if [ -n "$CONTAINERS_TO_STOP" ]; then
+                  docker stop $CONTAINERS_TO_STOP
+                  fi
+                  echo ${DOCKERHUB_PASSWORD} | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                  docker run  --name $CONTAINER_NAME -dp $SERVER_PORT:$SERVER_PORT "${IMAGE}:${VERSION}"
+                  docker system prune -a -f
+          services:
+            - docker  
+definitions:
+  services:
+    docker:
+      memory: 7128

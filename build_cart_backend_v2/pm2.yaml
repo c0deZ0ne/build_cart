@@ -1,0 +1,15 @@
+apps:
+  - script: ./dist/main.js
+    name: cutstruct-app
+    watch: true
+    instances: max
+    exec_mode: cluster
+    env_staging:
+      PORT: ${SERVER_PORT}
+      NODE_ENV: staging
+    env_sub:
+      PORT: ${SERVER_PORT}
+      NODE_ENV: subscription
+    env_production:
+      NODE_PORT: ${SERVER_PORT}
+      NODE_ENV: production

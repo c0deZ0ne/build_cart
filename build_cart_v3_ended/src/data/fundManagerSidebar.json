@@ -1,0 +1,41 @@
+{
+  "main": [
+    {
+      "title": "Dashboard",
+      "url": "/fund-manager/dashboard",
+      "icon": "DashboardIcon"
+    },
+    {
+      "title": "Projects",
+      "icon": "ProjectsIcon",
+      "url": "/fund-manager/project"
+    },
+    {
+      "title": "Project Invitation",
+      "url": "/fund-manager/invitations",
+      "icon": "ProjectInvitationIcon"
+    },
+    {
+      "title": "Builders",
+      "url": "/fund-manager/builders",
+      "icon": "SuppliersIcon"
+    }
+  ],
+  "account": [
+    {
+      "title": "Team",
+      "url": "/team",
+      "icon": "TeamIcon"
+    },
+    {
+      "title": "Vault",
+      "url": "/fund-manager/vault",
+      "icon": "Vault"
+    },
+    {
+      "title": "Support",
+      "url": "/support",
+      "icon": "SupportIcon"
+    }
+  ]
+}
